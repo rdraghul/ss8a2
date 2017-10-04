@@ -1,0 +1,101 @@
+import android.app.Activity;
+import android.database.Cursor;
+import android.net.Uri;
+import android.os.Bundle;
+import android.provider.ContactsContract;
+import android.util.Log;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
+
+public class AddContacts extends Activity implements OnClickListener {
+
+    ListView list;
+    Cursor cursor;
+    SimpleCursorAdapter adapter;
+    String phoneNumber;
+    Button AddNumber;
+    EditText number1;
+    EditText number2;
+    EditText number3;
+    String contact1;
+    String contact2;
+    CheckBox checkBox;
+    String contact_name;
+
+    static final String TAG = "In AddContacts";
+
+    @SuppressWarnings("deprecation")
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.listview);
+        AddNumber = (Button) findViewById(R.id.AddNumbers);
+        number1 = (EditText) findViewById(R.id.NumberField1);
+        number2 = (EditText) findViewById(R.id.NumberField2);
+        number3 = (EditText) findViewById(R.id.NumberField3);
+        AddNumber.setOnClickListener(this);
+        list = (ListView) findViewById(R.id.lists);
+
+
+        Log.d(TAG, "onCreate");
+
+
+
+        Cursor cursor = getContentResolver().query(
+                ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null,
+                null, null);
+
+        String[] nameNumberArray = new String[cursor.getCount()];
+        Log.d("rows", Integer.toString(cursor.getCount()));
+
+        Log.d("phone", "here");
+        while (cursor.moveToNext()) {
+            String phoneNumber =
+
+            cursor.getString(cursor
+                    .getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+            String name = cursor.getString(cursor
+                    .getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+            Log.i("Number + Name", phoneNumber + name);
+        }
+        if (cursor.getCount() > 0) {
+
+            int i = 0;
+            if (cursor.moveToFirst()) {
+                do {
+                    phoneNumber = cursor
+                            .getString(cursor
+                                    .getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+
+                    contact_name = cursor
+                            .getString(cursor
+                                    .getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+                    nameNumberArray[i] = contact_name + "  , " + phoneNumber;
+                    i++;
+                } while (cursor.moveToNext());
+            }
+
+        }
+
+        final String[] FROM = { nameNumberArray[0], nameNumberArray[1] };
+        final int[] TO = { R.id.contact_name, R.id.phone_number, };
+        adapter = new SimpleCursorAdapter(this, R.layout.row, cursor, FROM, TO);
+        list.setAdapter(adapter);
+        cursor.close();
+    }
+
+    @Override
+    public void onClick(View v) {
+
+
+        Log.d(TAG, "onClicked method");
+
+
+    }
+}
